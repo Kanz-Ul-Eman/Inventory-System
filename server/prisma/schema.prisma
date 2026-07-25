@@ -1,0 +1,146 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum Role {
+  ADMIN
+  STAFF
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  CANCELLED
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         Role
+  active       Boolean   @default(true)
+  lastLogin    DateTime?
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  orders        Order[]
+
+  @@index([role])
+  @@index([email])
+  @@index([id])
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products     Product[]
+}
+
+model Product {
+  id               Int       @id @default(autoincrement())
+  name             String
+  sku              String    @unique
+
+  categoryId       Int
+  category         Category  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  unitPrice        Decimal   @db.Decimal(10,2)
+
+  quantityInStock  Int
+
+  reorderLevel     Int
+
+  active           Boolean   @default(true)
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  orderItems       OrderItem[]
+
+  @@index([name])
+  @@index([categoryId])
+  @@index([active])
+  @@index([quantityInStock])
+}
+
+model Customer {
+  id          Int       @id @default(autoincrement())
+
+  name        String
+
+  email       String
+
+  phone       String
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  orders       Order[]
+
+  @@index([email])
+  @@index([id])
+}
+
+model Order {
+  id            Int           @id @default(autoincrement())
+
+  customerId    Int
+  customer      Customer      @relation(fields: [customerId], references: [id], onDelete: Restrict)
+
+  createdById   Int
+  createdBy     User          @relation(fields: [createdById], references: [id], onDelete: Restrict)
+
+  status        OrderStatus   @default(PENDING)
+
+  orderDate     DateTime      @default(now())
+
+  totalAmount   Decimal       @db.Decimal(10,2)
+
+  cancelledAt   DateTime?
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  orderItems    OrderItem[]
+
+  @@index([customerId])
+  @@index([createdById])
+  @@index([status])
+  @@index([orderDate])
+}
+
+model OrderItem {
+  id           Int      @id @default(autoincrement())
+
+  orderId      Int
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId    Int
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  quantity     Int
+
+  unitPrice    Decimal  @db.Decimal(10,2)
+
+  lineTotal    Decimal  @db.Decimal(10,2)
+
+  @@index([orderId])
+  @@index([productId])
+}

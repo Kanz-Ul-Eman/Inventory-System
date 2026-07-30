@@ -1,5 +1,6 @@
 const prisma = require("../config/prisma");
 const AppError = require("../utils/AppError");
+const paginate = require("../utils/paginate");
 
 const createProduct = async (data) => {
   const {
@@ -52,11 +53,8 @@ const createProduct = async (data) => {
   return product;
 };
 
-const getAllProducts = async (page = 1, limit = 10) => {
-  page = Number(page);
-  limit = Number(limit);
-
-  const skip = (page - 1) * limit;
+const getAllProducts = async (query = {}) => {
+  const { page, limit, skip } = paginate(query);
 
   const [products, totalProducts] = await Promise.all([
     prisma.product.findMany({

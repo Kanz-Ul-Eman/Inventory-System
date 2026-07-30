@@ -5,6 +5,10 @@ const env = require("./config/env");
 const authRoutes = require("./routes/auth.routes");
 const productRoutes = require("./routes/product.routes");
 const categoryRoutes = require("./routes/category.routes");
+const customerRoutes = require("./routes/customer.routes");
+const orderRoutes = require("./routes/order.routes");
+
+
 const app = express();
 
 /* -------------------------
@@ -32,6 +36,9 @@ app.use(
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/customers", customerRoutes);
+app.use("/api/orders", orderRoutes);
+
 
 /* -------------------------
    Health Check

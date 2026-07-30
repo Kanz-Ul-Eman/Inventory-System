@@ -1,110 +1,104 @@
 const productService = require("../services/product.service");
+const ApiResponse = require("../utils/ApiResponse");
+const STATUS = require("../constants/statusCodes");
+const MESSAGES = require("../constants/messages");
 
 const createProduct = async (req, res, next) => {
-    try {
-        const product = await productService.createProduct(req.body);
+  try {
+    const product = await productService.createProduct(req.body);
 
-        return res.status(201).json({
-            success: true,
-            message: "Product created successfully.",
-            product,
-        });
-    } catch (error) {
-        next(error);
-    }
+    return ApiResponse.success(res, STATUS.CREATED, MESSAGES.PRODUCT_CREATED, {
+      product,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const getAllProducts = async (req, res, next) => {
-    try {
-        const { page = 1, limit = 10 } = req.query;
+  try {
+    const result = await productService.getAllProducts(req.query);
 
-        const result = await productService.getAllProducts(page, limit);
-
-        return res.status(200).json({
-            success: true,
-            message: "Products fetched successfully.",
-            ...result,
-        });
-    } catch (error) {
-        next(error);
-    }
+    return ApiResponse.success(
+      res,
+      STATUS.OK,
+      MESSAGES.PRODUCTS_FETCHED,
+      result,
+    );
+  } catch (error) {
+    next(error);
+  }
 };
 
 const getProductById = async (req, res, next) => {
-    try {
-        const product = await productService.getProductById(req.params.id);
+  try {
+    const product = await productService.getProductById(req.params.id);
 
-        return res.status(200).json({
-            success: true,
-            product,
-        });
-    } catch (error) {
-        next(error);
-    }
+    return ApiResponse.success(res, STATUS.OK, MESSAGES.PRODUCT_FETCHED, {
+      product,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const updateProduct = async (req, res, next) => {
-    try {
-        const product = await productService.updateProduct(
-            req.params.id,
-            req.body
-        );
+  try {
+    const product = await productService.updateProduct(req.params.id, req.body);
 
-        return res.status(200).json({
-            success: true,
-            message: "Product updated successfully.",
-            product,
-        });
-    } catch (error) {
-        next(error);
-    }
+    return ApiResponse.success(res, STATUS.OK, MESSAGES.PRODUCT_UPDATED, {
+      product,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const deleteProduct = async (req, res, next) => {
-    try {
-        await productService.deleteProduct(req.params.id);
+  try {
+    await productService.deleteProduct(req.params.id);
 
-        return res.status(200).json({
-            success: true,
-            message: "Product deleted successfully.",
-        });
-    } catch (error) {
-        next(error);
-    }
+    return ApiResponse.success(res, STATUS.OK, MESSAGES.PRODUCT_DELETED);
+  } catch (error) {
+    next(error);
+  }
 };
 
 const searchProducts = async (req, res, next) => {
-    try {
-        const products = await productService.searchProducts(req.query.keyword);
+  try {
+    const products = await productService.searchProducts(req.query.keyword);
 
-        return res.status(200).json({
-            success: true,
-            products,
-        });
-    } catch (error) {
-        next(error);
-    }
+    return ApiResponse.success(res, STATUS.OK, MESSAGES.PRODUCTS_SEARCHED, {
+      products,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const getLowStockProducts = async (req, res, next) => {
-    try {
-        const products = await productService.getLowStockProducts();
+  try {
+    const products = await productService.getLowStockProducts();
 
-        return res.status(200).json({
-            success: true,
-            products,
-        });
-    } catch (error) {
-        next(error);
-    }
+    return ApiResponse.success(
+      res,
+      STATUS.OK,
+      MESSAGES.LOW_STOCK_PRODUCTS_FETCHED,
+      {
+        products,
+      },
+    );
+  } catch (error) {
+    next(error);
+  }
 };
 
 module.exports = {
-    createProduct,
-    getAllProducts,
-    getProductById,
-    updateProduct,
-    deleteProduct,
-    searchProducts,
-    getLowStockProducts,
+  createProduct,
+  getAllProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct,
+  searchProducts,
+  getLowStockProducts,
 };

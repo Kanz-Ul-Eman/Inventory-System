@@ -69,9 +69,9 @@ const getOrdersByCustomer = asyncHandler(async (req, res) => {
             req.params.customerId
         );
 
-    const message = result.orders.length != 0 
-    ? "Orders fetched successfully."
-    : "No matching orders found.";
+    const message = orders.length !== 0
+        ? "Orders fetched successfully."
+        : "No matching orders found.";
 
     return ApiResponse.success(
         res,
